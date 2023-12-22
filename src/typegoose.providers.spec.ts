@@ -9,9 +9,6 @@ import {
   convertToTypegooseClassWithOptions
 } from './typegoose.providers';
 import any = jasmine.any;
-
-const mongod = new MongoMemoryServer();
-
 class MockUser {
   @prop()
   name: string;
@@ -34,22 +31,18 @@ class MockTask {
 
 describe('createTypegooseProviders', () => {
   let connection: Connection;
+  const mongodPromise = MongoMemoryServer.create();
 
   beforeAll(async () => {
     jest.setTimeout(120000);
-
-    connection = await mongoose.createConnection(
-      await mongod.getConnectionString(),
-      {
-        useCreateIndex: true,
-        useFindAndModify: true,
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      }
+    const mongod = await mongodPromise;
+    connection = mongoose.createConnection(
+      mongod.getUri()
     );
   });
 
   afterAll(async () => {
+    const mongod = await mongodPromise;
     await mongoose.connection.close();
     await mongod.stop();
   });
@@ -236,8 +229,8 @@ describe('createTypegooseProviders', () => {
 });
 
 describe('convertToTypegooseClassWithOptions', () => {
-  class MockTypegooseClass {}
-  class MockDiscriminator {}
+  class MockTypegooseClass { }
+  class MockDiscriminator { }
 
   it('returns model as typegooseClass if it is just a class', () => {
     expect(convertToTypegooseClassWithOptions(MockTypegooseClass)).toEqual({

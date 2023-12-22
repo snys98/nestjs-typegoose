@@ -8,6 +8,7 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "skipLibCheck": true,
     "target": "es2017",
     "sourceMap": false,
     "outDir": "build",
